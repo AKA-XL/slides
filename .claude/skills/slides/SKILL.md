@@ -138,6 +138,7 @@ Slide rules:
 - For technical depth that the main audience doesn't need, add a final slide with `class="slide backup"` and the title prefix "Backup:".
 - Use semantic HTML only. No inline styles: build layouts from the theme's classes, and add a new class to `slides/_theme/theme.css` when none fits. That way every deck gains it.
 - Replace each `VISUAL` comment with the real figure or diagram once it exists. Reused paper figures go in `assets/`, credited in a `<figcaption>` (figure number, authors, year, license).
+- Add each new deck to the list in the root `index.html` (the GitHub Pages home page): link, title, audience, and source.
 - Render every slide at 1280×720 and look at it before calling a deck done. Nothing may overflow into the footer or off the canvas.
 
 Theme classes (see `slides/_theme/theme.css`):
