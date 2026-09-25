@@ -95,6 +95,11 @@ Decks run on **reveal.js 5.2.1** with the shared theme `slides/_theme/theme.css`
 
 </div>
 </div>
+
+<dl id="glossary" hidden>
+  <!-- <dt data-term="id">Term</dt> <dd>Plain-language definition.</dd> -->
+</dl>
+
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/notes/notes.js"></script>
 <script>
@@ -109,6 +114,7 @@ Decks run on **reveal.js 5.2.1** with the shared theme `slides/_theme/theme.css`
     plugins: [RevealNotes]
   });
 </script>
+<script src="../_theme/terms.js"></script>
 </body>
 </html>
 ```
@@ -136,6 +142,8 @@ Slide rules:
 - **Suggest one visual** per slide in the `VISUAL` comment. Prefer diagrams and figures over text.
 - **Speaker notes carry the comprehensiveness**: everything the presenter needs to say or defend.
 - For technical depth that the main audience doesn't need, add a final slide with `class="slide backup"` and the title prefix "Backup:".
+- **Define jargon with hover terms.** Wrap each technical term with `<span class="term" data-term="id">…</span>` the first time it appears on a slide, and define it once in the deck's `<dl id="glossary">`. `terms.js` adds an info icon that shows the definition on hover, focus, or tap. For non-specialist audiences, mark every term they might not know. Write definitions in 40 words or fewer, in plain language, and accurate: simplify, but never invent. Every `data-term` needs a glossary entry, and every entry needs a use.
+- **Explain building blocks with deep dives.** When the audience needs the components behind a system, add a linked index slide (`ol.chapters`, links like `#/dd-rag` to `<section id="dd-rag">`), then one slide per component: `.cols.three` with `.panel.what` (what it is, ending in a `.analogy`), `.panel.in` (what this work does with it), and `.panel.without` (what happens without it). Tag the "without it" claims with their source: `.tag.paper` when the paper showed it, `.tag.general` when it's general knowledge.
 - Use semantic HTML only. No inline styles: build layouts from the theme's classes, and add a new class to `slides/_theme/theme.css` when none fits. That way every deck gains it.
 - Replace each `VISUAL` comment with the real figure or diagram once it exists. Reused paper figures go in `assets/`, credited in a `<figcaption>` (figure number, authors, year, license).
 - Add each new deck to the list in the root `index.html` (the GitHub Pages home page): link, title, audience, and source.
@@ -155,6 +163,10 @@ Theme classes (see `slides/_theme/theme.css`):
 | `ol.flow` | Numbered process steps; start each `li` with `<strong>Step name</strong>` |
 | `table`, `table.dense` | Comparisons; `dense` for backup tables |
 | `.tag.ok` / `.partial` / `.no` / `.na` | Verdict pills |
+| `.tag.paper` / `.tag.general` | Source of a claim: shown in the paper vs general knowledge |
+| `.term[data-term]` + `#glossary` | Hover definition for a technical term (`terms.js`) |
+| `.panel.what` / `.panel.in` / `.panel.without`, `.analogy` | Deep-dive panels and the everyday comparison |
+| `ol.chapters` | Linked index of sections, e.g. a deep-dive table of contents |
 | `.small`, `.muted`, `.footnote` | Smaller text, grey text, a note under a table |
 | `.source` | Footer line for sources and footnotes |
 

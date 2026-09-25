@@ -8,14 +8,14 @@ Horizontal HTML slide decks for computational biology research talks, together w
 
 GitHub Pages serves this repository as static files from the `main` branch root (Settings → Pages → Deploy from a branch → `main` / `/ (root)`). Every push to `main` updates the site within a minute or two. Each deck is live at `https://aka-xl.github.io/slides/slides/<deck-name>/`.
 
-The published site is public and includes everything in the repository, `docs/` included, even though the repository itself is private.
+The published site is public and includes everything in the repository, `docs/` included.
 
 ## Layout
 
 | Path | Contents |
 |------|----------|
 | `slides/<deck-name>/index.html` | One deck per folder, with its images and data in `assets/` alongside it. Decks run on reveal.js 5.2.1; each slide is a top-level `<section>`. Open the file in a browser; press `S` for speaker notes. |
-| `slides/_theme/theme.css` | The shared theme every deck loads. |
+| `slides/_theme/` | Shared by every deck: `theme.css` (styles) and `terms.js` (hover definitions for technical terms, from each deck's glossary). |
 | `index.html` | GitHub Pages home page listing every deck. `.nojekyll` keeps Pages from dropping `_theme/`. |
 | `docs/` | Technical documentation: methods, datasets, parameters, results and their caveats, and decisions. This is the durable record of the context behind the slides. |
 | `docs/memos/repos/<owner>/<repo>.md` | Research memos on GitHub repositories, one per repository. |
