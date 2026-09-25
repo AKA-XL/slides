@@ -37,7 +37,7 @@ If the user says just "ELI5" with no other audience, use **General public** belo
 
 ## Step 2: Understand the Source Material
 
-Start with `docs/`, where the project's recorded context lives: method notes, dataset details, decisions, and repository memos in `docs/memos/repos/<owner>/<repo>.md`. Read whatever is relevant before explaining, and build on it rather than contradicting it. If a GitHub repository matters and has no memo yet, suggest running the `github-doc-researcher` agent first.
+Start with `docs/`, where the project's recorded context lives: method notes, dataset details, decisions, and repository memos in `docs/memos/repos/<owner>/<repo>.md`, and paper memos in `docs/memos/papers/<key>.md`. Read whatever is relevant before explaining, and build on it rather than contradicting it. If a paper or GitHub repository matters and has no memo yet, suggest running the `paper-researcher` or `github-doc-researcher` agent first.
 
 Then understand what you are explaining:
 - **Code / pipeline**: Read it. Know each step's input, output, and purpose before translating.

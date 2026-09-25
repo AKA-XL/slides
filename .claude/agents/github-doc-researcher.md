@@ -78,6 +78,8 @@ Cite code with permalinks pinned to the researched commit, so citations never go
 
 Separate what you verified in the code from what you inferred, and mark inferences with *(inferred)*. Keep the prose concise but complete: short sentences, no filler, and nothing important left out.
 
+If the repository accompanies a paper, name the paper in What it does. If it has a memo at `docs/memos/papers/<key>.md`, link it; if it doesn't, recommend running `paper-researcher` on it in your report.
+
 ```markdown
 # <owner>/<repo>
 
