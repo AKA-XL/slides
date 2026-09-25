@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecting ChatGEM</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css">
+<link rel="stylesheet" href="../_theme/theme.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Context: docs/memos/papers/chowdhury2026-chatgem.md -->
+
+<section class="slide title" data-audience="engineer">
+  <p class="eyebrow">Paper deep dive · for AI engineers</p>
+  <h1>Architecting ChatGEM: Agentic AI for Genome-Scale Metabolic Modeling</h1>
+  <p class="subtitle">Bridging deterministic bio-simulation with agentic LLM orchestration</p>
+  <ul>
+    <li>Query, edit, and simulate <strong>GEMs</strong> in natural language</li>
+    <li>LLM writes <strong>COBRApy</strong> / <strong>StrainDesign</strong> / <strong>Gurobi</strong> code; a sandbox runs it</li>
+    <li>Evidence: 3 benchmark tasks + a <em>P. putida</em> succinate case study</li>
+  </ul>
+  <p class="meta">
+    Chowdhury, George, … Rigor, Bardhan (21 authors, PNNL). “ChatGEM: An Agentic Architecture Enabling Interactive Simulation of Genome-Scale Metabolic Models.”<br>
+    bioRxiv, 2026-07-21 · <a href="https://doi.org/10.64898/2026.07.20.739662">doi:10.64898/2026.07.20.739662</a> · Preprint, not peer reviewed
+  </p>
+  <aside class="notes">
+    ChatGEM lets a researcher describe a metabolic-modeling task in plain language. An LLM agent turns it into Python that calls real simulation software (COBRApy, StrainDesign, the Gurobi solver), and runs that code in an isolated container. The LLM never computes fluxes itself.
+    Framing for this deck: every architectural claim is checked against the paper and the public ADEPT code. Where the paper is silent but the code answers, the slide says "ADEPT repo". Where a common description of ChatGEM is wrong (for example, LangGraph approval breakpoints or COBRApy as its own MCP server), the slide corrects it. The full claim check is in the backup slides and in docs/memos/papers/chowdhury2026-chatgem.md.
+    Status: a preprint posted 2026-07-21 with zero citations so far. Treat the numbers as early evidence.
+  </aside>
+</section>
+
+<section class="slide" data-audience="engineer">
+  <p class="eyebrow">What is ChatGEM? · The core paradigm</p>
+  <h2>ChatGEM = PNNL’s ADEPT platform + a GEM-ready sandbox + a curated script library</h2>
+  <div class="cols text-figure">
+    <div>
+      <div class="block">
+        <h3>The problem</h3>
+        <ul class="small">
+          <li>FBA, OptKnock, ecGEMs demand <strong>COBRApy</strong> or MATLAB coding</li>
+          <li>No prior tool runs these simulations conversationally</li>
+        </ul>
+      </div>
+      <div class="block">
+        <h3>Three technical pillars</h3>
+        <ul class="small">
+          <li><strong>Orchestration:</strong> ADEPT orchestration service, <strong>LangGraph</strong> underneath*</li>
+          <li><strong>Simulation:</strong> <strong>COBRApy</strong>, <strong>StrainDesign</strong>, hand-built <strong>Gurobi</strong> MILPs</li>
+          <li><strong>Execution:</strong> containerized <strong>sandbox MCP server</strong>; <strong>nsjail</strong> optional*</li>
+        </ul>
+      </div>
+    </div>
+    <figure>
+      <img src="assets/fig1-architecture.jpg" alt="ChatGEM architecture: ChatGEM libraries on top of the ADEPT foundation, with gateway, orchestration service, stateless MCP tool servers, storage, observability, model providers, and A2A federation">
+      <figcaption>Fig. 1, Chowdhury et al. 2026 (CC BY 4.0). AI-assisted schematic, per the paper.</figcaption>
+    </figure>
+  </div>
+  <p class="source">* From the ADEPT code (github.com/pnnl/adept-agentic @ 9c603ca), not the paper. nsjail is off by default there. The paper does not say which ADEPT configuration ChatGEM ran.</p>
+  <aside class="notes">
+    ChatGEM is not a new framework. It is an application of ADEPT, PNNL's general agentic platform (George et al. 2025, Zenodo 10.5281/zenodo.17315801). ChatGEM "inherits from ADEPT's full architecture" and adds three things: a sandbox image with COBRApy, StrainDesign and Gurobi (plus a Gurobi license-manager tool); raised run-time limits for long strain-design jobs; and a retrieval corpus of 52 hand-curated COBRApy scripts.
+    ADEPT has three tiers: a Keycloak gateway, an orchestration service that coordinates agents and persists conversations in PostgreSQL, and stateless MCP tool servers. Redis holds tool settings; ChromaDB holds the knowledge base. Models are configured in YAML; ChatGEM defaults to o4-mini.
+    The paper never names LangGraph or nsjail. The ADEPT code does use LangGraph: a custom StateGraph with Postgres checkpoints. nsjail is supported there but disabled by default, with a note that it "breaks plot generation". So we can't say ChatGEM used nsjail.
+    Fig. 1 was made with AI assistance, per the paper's AI-usage statement. It matches the text, but treat it as a schematic.
+  </aside>
+</section>
+
+<section class="slide" data-audience="engineer">
+  <p class="eyebrow">Novel innovations · vs a naive LLM wrapper</p>
+  <h2>The real innovation: LLM code grounded in a curated library of working GEM scripts</h2>
+  <table>
+    <thead>
+      <tr><th></th><th>Naive LLM wrapper</th><th>ChatGEM</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Who computes biology</strong></td><td>LLM guesses numbers</td><td><strong>Deterministic safeguard:</strong> solvers compute; LLM only writes code</td></tr>
+      <tr><td><strong>Knowledge source</strong></td><td>Model memory; invents APIs</td><td>Retrieval over <strong>52 curated scripts</strong> in <strong>ChromaDB</strong></td></tr>
+      <tr><td><strong>Execution</strong></td><td>None, or on the host</td><td>Isolated <strong>sandbox container</strong>, resource limits, egress allowlist</td></tr>
+      <tr><td><strong>Human in the loop</strong></td><td>Types a question, trusts the answer</td><td>Writes a step-by-step protocol; inspects the code</td></tr>
+      <tr><td><strong>Agents</strong></td><td>One chat model</td><td>One <strong>Scientific Workflow Agent</strong> with tools</td></tr>
+    </tbody>
+  </table>
+  <p class="footnote"><span class="tag no">Not in the paper</span> LangGraph approval breakpoints · named RAG / Code-Gen / Sandbox agents · literature RAG</p>
+  <aside class="notes">
+    Deterministic safeguard: this holds. The LLM writes Python, and COBRApy, StrainDesign and Gurobi do the math inside the sandbox. But note who writes the plan: each benchmark prompt is a human-written lettered protocol (steps A to K) with reaction IDs, bounds and the algorithm already chosen. The LLM translates the plan into code; it does not design the analysis.
+    Grounding is the real lever. Without retrieval, models invented APIs (GPT-4.1 made up a "strain_design" package), used the wrong library (Cameo instead of StrainDesign), or wrote broken MILP constraints. With retrieval they adapted working scripts.
+    Human in the loop: the only HITL in the paper is a timing condition, "ChatGEM coding with manual inspection" (Fig. 2D–F). There are no approval breakpoints, and no LangGraph interrupt code in ADEPT's source. The paper mentions no 4-hour simulations; the longest reported run is 954 s.
+    Agents: the abstract says "specialized agents", but Methods name only ADEPT's Scientific Workflow Agent. ADEPT supports supervisor and planner multi-agent modes, but the paper doesn't say ChatGEM used them. The RAG corpus is Python scripts (plus COBRApy/StrainDesign docs in the repo), not literature.
+  </aside>
+</section>
+
+<section class="slide" data-audience="engineer">
+  <p class="eyebrow">Strategic advantages · Scientific impact</p>
+  <h2>Retrieval lifted judged code quality 2.63 → 4.20 and cut coding to minutes</h2>
+  <div class="cols text-figure">
+    <div>
+      <div class="kpis">
+        <div class="kpi"><b>2.63 → 4.20</b><span>Mean code score /5, o4-mini, no RAG → RAG</span></div>
+        <div class="kpi"><b>~1 day → 13 min</b><span>OptKnock coding, manual (est.) → agent</span></div>
+      </div>
+      <ul class="small">
+        <li><strong>Rapid iteration:</strong> OptKnock strain design coded in <strong>774 s</strong></li>
+        <li><strong>Reproducible:</strong> <strong>Langfuse</strong> / <strong>LangSmith</strong> can trace every LLM and tool call</li>
+        <li><strong>Cross-domain:</strong> biologists without Python are the goal; <strong>not yet user-tested</strong></li>
+        <li><strong>Caveat:</strong> 1 run per task; with-RAG code ≈ copies of corpus scripts</li>
+      </ul>
+    </div>
+    <figure>
+      <img src="assets/fig2-evaluation.jpg" alt="Fig. 2: code scores with and without RAG for three tasks (A–C), task protocols, and coding time for manual coding, ChatGEM with inspection, and ChatGEM alone (D–F)">
+      <figcaption>Fig. 2, Chowdhury et al. 2026 (CC BY 4.0). A–C: judged score; D–F: coding time (s).</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    Benchmark: three tasks on the P. putida KT2440 model iJN1463. Task 1 is FBA plus four reaction knockouts; Task 2 is OptKnock strain design for succinate; Task 3 is ecOptMDFPathway, a custom Gurobi MILP. Each ran once with and once without retrieval. One LLM judge (Claude Sonnet 4.6) scored accuracy and completeness from 1 to 5, combined as 0.7 × accuracy + 0.3 × completeness.
+    o4-mini went from 2.63 to 4.20 on average; GPT-4.1 from 2.18 to 4.20. The authors say retrieval "equalizes" models, so the cheaper o4-mini is enough. Inference cost was not reported.
+    Time: FBA was 254 s manual vs 184 s with inspection vs 3.9 s agent-only; the "65×" headline is that last pair. With inspection it's about 1.4×. OptKnock was 774 s (954 s with inspection) vs "~order of a day" manually. That manual figure is an estimate, not a measurement. ecOptMDF was 41.8 s (221.8 s with inspection).
+    Audit: Langfuse and LangSmith tracing are ADEPT capabilities. The paper doesn't use traces in its results.
+    Main caveat: the retrieval corpus already contains near-exact solutions. With-RAG Task 3 code matches the corpus script on 183 of 184 lines, and both models produced identical with-RAG code. The gain mostly measures retrieving the answer key, not generalizing. See backup.
+  </aside>
+</section>
+
+<section class="slide" data-audience="engineer">
+  <p class="eyebrow">Deep dive · The MCP superpower</p>
+  <h2>MCP is the contract between a non-deterministic agent and deterministic tools</h2>
+  <div class="cols three">
+    <div class="panel">
+      <h3>Tool abstraction</h3>
+      <ul>
+        <li><strong>BLAST</strong>, <strong>UniProt</strong>, <strong>PubChem</strong>, <strong>Nextflow</strong> as MCP tool servers</li>
+        <li>Schemas over <strong>JSON-RPC</strong> (ADEPT repo)</li>
+        <li>LLM sees typed tools, not raw APIs</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Decoupled scaling</h3>
+      <ul>
+        <li>Servers are <strong>stateless</strong>; state lives in the orchestrator</li>
+        <li>Swap or scale a server without touching agent logic</li>
+        <li><strong>COBRApy / StrainDesign are not separate servers</strong>: they’re installed in the sandbox image</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Secure execution</h3>
+      <ul>
+        <li>Generated code goes to the <strong>sandbox MCP server</strong></li>
+        <li>Isolated network, non-root, dropped capabilities, CPU/memory caps, egress allowlist, AST import check</li>
+        <li><strong>nsjail</strong> opt-in, off by default; timeout 30 s default, 300 s max</li>
+      </ul>
+    </div>
+  </div>
+  <p class="source">Paper p. 4–5, Methods p. 11–12; sandbox details from github.com/pnnl/adept-agentic @ 9c603ca (sandbox_mcp_server).</p>
+  <aside class="notes">
+    The paper describes ADEPT's third tier as "stateless MCP tool servers" that run scientific tools (BLAST, UniProt, PubChem), HPC pipelines (Nextflow), and "sandboxed code on demand". JSON-RPC isn't in the paper, but ADEPT's README says its servers speak the MCP JSON-RPC protocol.
+    One correction to a common description: COBRApy and StrainDesign are not their own MCP servers. They are Python dependencies installed in ChatGEM's "custom Python code execution environment" inside the sandbox container. The agent reaches them by writing code, not by calling typed "run_fba" tools. That's flexible but less constrained. We come back to the trade-off in the takeaways.
+    Sandbox details come from the ADEPT code: subprocess execution in a dedicated container on an isolated network that can reach only the orchestration service, a non-root user, dropped capabilities, CPU and memory limits, an egress allowlist, and AST-based import checks. nsjail is supported but disabled by default ("breaks plot generation"). The default timeout is 30 s with a 300 s maximum, below the 774 s OptKnock run, which is why the authors raised "run-time allowances".
+  </aside>
+</section>
+
+<section class="slide" data-audience="engineer">
+  <p class="eyebrow">How the system works · The technical lifecycle</p>
+  <h2>One strain-design request, end to end: the paper’s OptKnock task</h2>
+  <ol class="flow">
+    <li><strong>Input</strong>User uploads <strong><em>P. putida</em> iJN1463</strong> and a lettered protocol: OptKnock for succinate, ≤2 knockouts, ≥10% WT growth</li>
+    <li><strong>Retrieve</strong>Agent searches <strong>ChromaDB</strong> over the 52 curated scripts; finds <code>44._optknock.py</code></li>
+    <li><strong>Generate</strong><strong>Scientific Workflow Agent</strong> (LangGraph ReAct loop) adapts it into <strong>StrainDesign OptKnock</strong> code</li>
+    <li><strong>Execute</strong><strong>Sandbox MCP server</strong> runs it with <strong>Gurobi</strong>; run-time limits raised for long jobs</li>
+    <li><strong>Return</strong>Printed values + <strong>Excel</strong> export; large outputs go to files, summaries go back to the LLM</li>
+    <li><strong>Report</strong>Agent answers in chat. Separately, <strong>Claude Sonnet 4.6</strong> judged the code (evaluation only)</li>
+  </ol>
+  <p class="source">Agent-only coding time 774 s; 954 s with manual inspection (Fig. 2E). Step 3 loop and step 5 file handling from the ADEPT repo. The paper has no <em>E. coli</em> / PubChem / JSON-return workflow.</p>
+  <aside class="notes">
+    This is Task 2 from the benchmark, the closest real analogue to a "find knockouts for succinate" request. It uses P. putida KT2440, not E. coli.
+    1. The prompt is a detailed human protocol: glucose uptake −6 mmol/gDW/h, eight exchanges set to secretion only, at most two knockouts, at least 10% of wild-type growth, nine excluded reactions, and export to Excel. The user also uploads the SBML model and data files.
+    2. The curated corpus was uploaded and ingested into ChromaDB. It includes 44._optknock.py, which solves this task on this model.
+    3. In the ADEPT code, the Scientific Workflow Agent is a LangGraph StateGraph with agent, action and terminate nodes. A loop guard ends runs after 3 identical tool calls in the last 10 messages, or 3 failures of the same tool.
+    4. Execution is routed to the ChatGEM sandbox container. The OptKnock job is a bilevel MILP solved by Gurobi.
+    5. Results are printed and exported to Excel, not returned as JSON by a COBRApy server. ADEPT writes large tool outputs to files and returns summaries so the context stays small.
+    6. The LLM judge is part of the evaluation, not the product loop.
+    Detail worth knowing: the paper says the code "excluded nine essential reactions from the knockout search". The code actually asks for one solution and discards it afterwards if it contains an excluded reaction, so it can return nothing.
+  </aside>
+</section>
+
+<section class="slide" data-audience="engineer">
+  <p class="eyebrow">Engineering takeaways · Build your own ME agent</p>
+  <h2>Keep ChatGEM’s sandbox and curated retrieval; add the guardrails it lacks</h2>
+  <table>
+    <thead>
+      <tr><th>Blueprint</th><th>In ChatGEM?</th><th>How to build it</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>The script corpus is the product</strong></td><td><span class="tag ok">Yes: 52 scripts</span></td><td>Cover each analysis you support; version it like code</td></tr>
+      <tr><td><strong>State is king</strong></td><td><span class="tag partial">Chat state only</span></td><td>Typed <strong>LangGraph</strong> state: model ID, bounds, knockouts, objective; <strong>Postgres</strong> checkpoints</td></tr>
+      <tr><td><strong>Encapsulate compute via MCP</strong></td><td><span class="tag partial">Sandbox only</span></td><td>Typed tools (<code>run_fba</code>, <code>optknock</code>) for common ops; sandbox for the long tail</td></tr>
+      <tr><td><strong>Guardrails on model edits</strong></td><td><span class="tag no">No</span></td><td><strong>Pydantic</strong>: reaction IDs exist, bounds valid, before any solve</td></tr>
+      <tr><td><strong>Human approval gates</strong></td><td><span class="tag no">No</span></td><td>LangGraph <code>interrupt()</code> before long or destructive runs</td></tr>
+      <tr><td><strong>Execution-based evals</strong></td><td><span class="tag no">No: 1 LLM judge</span></td><td>Compare fluxes and knockout sets to references; held-out tasks; repeats</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    These are recommendations. The "In ChatGEM?" column says what the paper and the ADEPT code actually have.
+    Corpus: ChatGEM's reliability comes from its 52 working scripts. Anything outside the corpus is untested. Treat the corpus as a product: version it, test it, and when benchmarking, hold out tasks that the corpus doesn't already solve.
+    State: ADEPT's AgentState holds messages and tool outputs, checkpointed to Postgres with hierarchical thread IDs. Nothing tracks the metabolic model itself. Make model ID, current bounds, active knockouts and objective explicit typed state, so every step is reproducible and inspectable.
+    MCP: ChatGEM reaches COBRApy only through free-form code. For frequent operations, typed MCP tools give validated inputs, structured JSON outputs and easy testing. Keep the sandbox for novel analyses.
+    Guardrails and approvals: neither exists in ChatGEM. Pydantic appears in ADEPT only for configuration. Validate model edits before solving, and pause for human approval before long or destructive jobs.
+    Evaluation: score by execution (compare fluxes, knockout sets and objective values against reference outputs) and repeat runs. A single LLM judge was inconsistent here.
+    Ops: plan for solver licensing (a Gurobi token server or license manager), long-job timeouts beyond 300 s, async polling, and SBML/Excel file I/O.
+  </aside>
+</section>
+
+<section class="slide backup" data-audience="engineer">
+  <p class="eyebrow">Backup</p>
+  <h2>Backup: the common ChatGEM description, checked claim by claim</h2>
+  <table class="dense">
+    <thead>
+      <tr><th>Claim</th><th>Verdict</th><th>What the paper shows</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Built on PNNL’s ADEPT</td><td><span class="tag ok">Supported</span></td><td>“Built from the ADEPT framework”</td></tr>
+      <tr><td>LangGraph orchestration</td><td><span class="tag na">Not addressed</span></td><td>Not in the paper; the ADEPT repo uses it</td></tr>
+      <tr><td>COBRApy + StrainDesign</td><td><span class="tag ok">Supported</span></td><td>Plus hand-built Gurobi MILPs</td></tr>
+      <tr><td>nsjail sandboxes</td><td><span class="tag partial">Partly</span></td><td>Container yes; nsjail optional, off by default in ADEPT</td></tr>
+      <tr><td>LLM plans, software computes</td><td><span class="tag partial">Partly</span></td><td>Software computes; the human writes the plan</td></tr>
+      <tr><td>HITL breakpoints before 4-h runs</td><td><span class="tag no">Not supported</span></td><td>No approval gates; longest run 954 s</td></tr>
+      <tr><td>RAG / Code-Gen / Sandbox agents</td><td><span class="tag partial">Partly</span></td><td>One agent; RAG over scripts, not literature</td></tr>
+      <tr><td>Days → minutes</td><td><span class="tag partial">Partly</span></td><td>“~a day” (estimated) → 13 min, coding only</td></tr>
+      <tr><td>Langfuse / LangSmith audit</td><td><span class="tag ok">Supported</span></td><td>Available; not used in results</td></tr>
+      <tr><td>Biologists run FBA without Python</td><td><span class="tag partial">Partly</span></td><td>The stated aim; no user study</td></tr>
+      <tr><td>COBRApy / StrainDesign as MCP servers</td><td><span class="tag partial">Partly</span></td><td>Tools use MCP; COBRApy lives inside the sandbox</td></tr>
+      <tr><td><em>E. coli</em> succinate workflow</td><td><span class="tag no">Contradicted</span></td><td>Real task: <em>P. putida</em> OptKnock, Excel output</td></tr>
+      <tr><td>Pydantic validators on model edits</td><td><span class="tag na">Not addressed</span></td><td>Pydantic only for config</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    The original brief for this deck described ChatGEM with several specifics that the paper doesn't support. Each was checked against the full text, the supplements, and the ADEPT and ChatGEM repositories. Evidence for every row, with page and figure references, is in the Claim check section of docs/memos/papers/chowdhury2026-chatgem.md.
+    Pattern to notice: the general platform claims hold up (ADEPT, the COBRA stack, MCP tool servers, tracing). The specific engineering claims (breakpoints, named sub-agents, validators, separate COBRApy servers, the E. coli workflow) do not. Those are good design ideas, and they appear on the takeaways slide as recommendations, not as ChatGEM features.
+  </aside>
+</section>
+
+<section class="slide backup" data-audience="engineer">
+  <p class="eyebrow">Backup</p>
+  <h2>Backup: read the headline numbers with care</h2>
+  <div class="cols">
+    <div>
+      <h3>Benchmark</h3>
+      <ul class="small">
+        <li><strong>Answer key in the corpus:</strong> with-RAG Task 3 code matches <code>51._ecOptMDFPathway.py</code> on 183 of 184 lines</li>
+        <li><strong>Tiny sample:</strong> 3 tasks × 1 run; no variance, no held-out tasks</li>
+        <li><strong>One LLM judge</strong>, inconsistent on byte-identical code</li>
+        <li><strong>“65×”</strong> = 254 s vs 3.9 s without inspection; <strong>1.4×</strong> with it</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Case study</h3>
+      <ul class="small">
+        <li><strong>n = 4 strains</strong>; predicted rates compared with measured titers</li>
+        <li>Enzyme demand vs proteomics: <strong>r = 0.50</strong>, called “strong agreement”</li>
+        <li>Paper’s own leakage index: WT (0.12) ≤ Constitutive (0.13) at 24&nbsp;h</li>
+        <li>No transcripts: the agent’s share of the analysis is unknown</li>
+      </ul>
+    </div>
+  </div>
+  <p class="source">Sources: bioRxiv 10.64898/2026.07.20.739662 (v2), Supp. Files 1–2 · github.com/pnnl/ChatGEM @ b347e47 · github.com/pnnl/adept-agentic @ 9c603ca · Full analysis: docs/memos/papers/chowdhury2026-chatgem.md</p>
+  <aside class="notes">
+    Benchmark: the retrieval corpus contains 44._optknock.py and 51._ecOptMDFPathway.py, which solve Tasks 2 and 3 on the same model with the same data. With-RAG outputs are near-verbatim copies (Task 2: 175 of 182 lines; Task 3: 183 of 184), and o4-mini and GPT-4.1 produced identical with-RAG code on all three tasks. So "RAG equalizes models" follows automatically. It says nothing about tasks the corpus doesn't cover.
+    Judge: on byte-identical OptKnock code, one judge report says a delta column is missing and the other says it's present. The code does contain it.
+    Case study: eight enzyme-constrained models (4 strains × 12 h and 24 h) ranked the Constitutive dCas12a strain best, and it did have the highest measured titer at 24 h (≈0.43 g/L). But at 24 h the model predicts wild type and Landing Pad equal, while Landing Pad measured about 35% lower. It predicts the Induced strain declines while it measured rising. And the paper's own leakage-index numbers contradict its "lowest at both time points" claim for Constitutive.
+    None of this makes ChatGEM uninteresting. The architecture is a sound pattern. But the evaluation is an early proof of concept, not evidence of general capability.
+  </aside>
+</section>
+
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    center: false,
+    hash: true,
+    slideNumber: "c/t",
+    transition: "none",
+    plugins: [RevealNotes]
+  });
+</script>
+</body>
+</html>

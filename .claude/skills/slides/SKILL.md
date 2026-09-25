@@ -73,7 +73,47 @@ Simplify ruthlessly, but never say something false or overclaim:
 
 ### Slide HTML format
 
-Horizontal decks only: every slide is a **top-level `<section>`** placed one after another, never nested. (This matches reveal.js horizontal slides and works as plain HTML.)
+Decks run on **reveal.js 5.2.1** with the shared theme `slides/_theme/theme.css`. A new deck starts from this scaffold. Copy it exactly so every deck behaves the same way (1280×720 canvas, top-aligned slides, `S` for the speaker view with notes, `?` for keyboard help):
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deck title</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css">
+<link rel="stylesheet" href="../_theme/theme.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Context: docs/… files this deck draws on -->
+
+<!-- slides go here -->
+
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    center: false,
+    hash: true,
+    slideNumber: "c/t",
+    transition: "none",
+    plugins: [RevealNotes]
+  });
+</script>
+</body>
+</html>
+```
+
+Horizontal decks only: every slide is a **top-level `<section>`** inside `.slides`, placed one after another, never nested.
 
 ```html
 <section class="slide" data-audience="mixed">
@@ -96,7 +136,26 @@ Slide rules:
 - **Suggest one visual** per slide in the `VISUAL` comment. Prefer diagrams and figures over text.
 - **Speaker notes carry the comprehensiveness**: everything the presenter needs to say or defend.
 - For technical depth that the main audience doesn't need, add a final slide with `class="slide backup"` and the title prefix "Backup:".
-- Use semantic HTML only. No inline styles; styling belongs in the deck's CSS.
+- Use semantic HTML only. No inline styles: build layouts from the theme's classes, and add a new class to `slides/_theme/theme.css` when none fits. That way every deck gains it.
+- Replace each `VISUAL` comment with the real figure or diagram once it exists. Reused paper figures go in `assets/`, credited in a `<figcaption>` (figure number, authors, year, license).
+- Render every slide at 1280×720 and look at it before calling a deck done. Nothing may overflow into the footer or off the canvas.
+
+Theme classes (see `slides/_theme/theme.css`):
+
+| Class | Use |
+|-------|-----|
+| `title` (on `section`) | Title slide; pair with `h1`, `.subtitle`, `.meta` |
+| `backup` (on `section`) | Backup slides at the end |
+| `.eyebrow` | Small section label above the `h2` |
+| `.cols`, `.cols.text-figure`, `.cols.three` | Two columns, text beside a figure, three panels |
+| `.block` | Stacked groups within one column, each with an `h3` |
+| `.panel` | Boxed card, usually inside `.cols.three` |
+| `.kpis` > `.kpi` > `b` + `span` | Headline numbers with a label |
+| `ol.flow` | Numbered process steps; start each `li` with `<strong>Step name</strong>` |
+| `table`, `table.dense` | Comparisons; `dense` for backup tables |
+| `.tag.ok` / `.partial` / `.no` / `.na` | Verdict pills |
+| `.small`, `.muted`, `.footnote` | Smaller text, grey text, a note under a table |
+| `.source` | Footer line for sources and footnotes |
 
 ## Examples
 

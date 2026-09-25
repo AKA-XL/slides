@@ -6,7 +6,8 @@ Horizontal HTML slide decks for computational biology research talks, together w
 
 | Path | Contents |
 |------|----------|
-| `slides/<deck-name>/index.html` | One deck per folder, with its images and data in `assets/` alongside it. Each slide is a top-level `<section>`. |
+| `slides/<deck-name>/index.html` | One deck per folder, with its images and data in `assets/` alongside it. Decks run on reveal.js 5.2.1; each slide is a top-level `<section>`. Open the file in a browser; press `S` for speaker notes. |
+| `slides/_theme/theme.css` | The shared theme every deck loads. |
 | `docs/` | Technical documentation: methods, datasets, parameters, results and their caveats, and decisions. This is the durable record of the context behind the slides. |
 | `docs/memos/repos/<owner>/<repo>.md` | Research memos on GitHub repositories, one per repository. |
 | `docs/memos/papers/<key>.md` | Research memos on papers, one per paper, keyed like `lopez2018-deep`. |
