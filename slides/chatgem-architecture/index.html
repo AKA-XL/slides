@@ -15,12 +15,12 @@
 
 <section class="slide title" data-audience="mixed">
   <p class="eyebrow">Paper deep dive · no background needed</p>
-  <h1>Architecting ChatGEM: Agentic AI for Genome-Scale Metabolic Modeling</h1>
-  <p class="subtitle">Bridging deterministic bio-simulation with agentic LLM orchestration</p>
+  <h1>Architecting ChatGEM: <span class="term" data-term="agent">Agentic</span> AI for Genome-Scale Metabolic Modeling</h1>
+  <p class="subtitle">Bridging <span class="term" data-term="deterministic">deterministic</span> bio-simulation with agentic <span class="term" data-term="llm">LLM</span> <span class="term" data-term="orchestration">orchestration</span></p>
   <ul>
     <li>Query, edit, and simulate <strong><span class="term" data-term="gem">GEMs</span></strong> in natural language</li>
     <li>An AI writes <strong><span class="term" data-term="cobrapy">COBRApy</span></strong> / <strong><span class="term" data-term="straindesign">StrainDesign</span></strong> / <strong><span class="term" data-term="gurobi">Gurobi</span></strong> code; a <span class="term" data-term="sandbox">sandbox</span> runs it</li>
-    <li>Evidence: 3 benchmark tasks + a <em><span class="term" data-term="pputida">P. putida</span></em> <span class="term" data-term="succinate">succinate</span> case study</li>
+    <li>Evidence: 3 <span class="term" data-term="benchmark">benchmark</span> tasks + a <em><span class="term" data-term="pputida">P. putida</span></em> <span class="term" data-term="succinate">succinate</span> case study</li>
   </ul>
   <p class="meta">
     Chowdhury, George, … Rigor, Bardhan (21 authors, <span class="term" data-term="pnnl">PNNL</span>). “ChatGEM: An Agentic Architecture Enabling Interactive Simulation of Genome-Scale Metabolic Models.”<br>
@@ -37,7 +37,7 @@
 
 <section class="slide" data-audience="mixed">
   <p class="eyebrow">What is ChatGEM? · The core paradigm</p>
-  <h2>ChatGEM = PNNL’s <span class="term" data-term="adept">ADEPT</span> platform + a GEM-ready <span class="term" data-term="sandbox">sandbox</span> + a curated script library</h2>
+  <h2>ChatGEM = <span class="term" data-term="pnnl">PNNL</span>’s <span class="term" data-term="adept">ADEPT</span> platform + a <span class="term" data-term="gem">GEM</span>-ready <span class="term" data-term="sandbox">sandbox</span> + a curated <span class="term" data-term="corpus">script library</span></h2>
   <div class="cols text-figure">
     <div>
       <div class="block">
@@ -72,24 +72,24 @@
 
 <section class="slide" data-audience="mixed">
   <p class="eyebrow">Novel innovations · vs a naive LLM wrapper</p>
-  <h2>The real innovation: AI-written code grounded in a curated library of working GEM scripts</h2>
+  <h2>The real innovation: AI-written code grounded in a curated library of working <span class="term" data-term="gem">GEM</span> scripts</h2>
   <table>
     <thead>
-      <tr><th></th><th>Naive <span class="term" data-term="llm">LLM</span> wrapper</th><th>ChatGEM</th></tr>
+      <tr><th></th><th>Naive <span class="term" data-term="wrapper">LLM wrapper</span></th><th>ChatGEM</th></tr>
     </thead>
     <tbody>
-      <tr><td><strong>Who computes biology</strong></td><td>LLM guesses numbers</td><td><strong><span class="term" data-term="deterministic">Deterministic</span> safeguard:</strong> <span class="term" data-term="solver">solvers</span> compute; LLM only writes code</td></tr>
+      <tr><td><strong>Who computes biology</strong></td><td><span class="term" data-term="llm">LLM</span> guesses numbers</td><td><strong><span class="term" data-term="deterministic">Deterministic</span> safeguard:</strong> <span class="term" data-term="solver">solvers</span> compute; LLM only writes code</td></tr>
       <tr><td><strong>Knowledge source</strong></td><td>Model memory; invents <span class="term" data-term="api">APIs</span></td><td>Retrieval (<span class="term" data-term="rag">RAG</span>) over <strong>52 curated scripts</strong> in <strong><span class="term" data-term="chromadb">ChromaDB</span></strong></td></tr>
-      <tr><td><strong>Execution</strong></td><td>None, or on the host computer</td><td>Isolated <strong><span class="term" data-term="sandbox">sandbox</span> container</strong>, resource limits, <span class="term" data-term="egress">egress allowlist</span></td></tr>
+      <tr><td><strong>Execution</strong></td><td>None, or on the host computer</td><td>Isolated <strong><span class="term" data-term="sandbox">sandbox</span> <span class="term" data-term="container">container</span></strong>, resource limits, <span class="term" data-term="egress">egress allowlist</span></td></tr>
       <tr><td><strong><span class="term" data-term="hitl">Human in the loop</span></strong></td><td>Types a question, trusts the answer</td><td>Writes a step-by-step protocol; inspects the code</td></tr>
-      <tr><td><strong>Agents</strong></td><td>One chat model</td><td>One <strong><span class="term" data-term="swa">Scientific Workflow Agent</span></strong> with tools</td></tr>
+      <tr><td><strong><span class="term" data-term="agent">Agents</span></strong></td><td>One chat model</td><td>One <strong><span class="term" data-term="swa">Scientific Workflow Agent</span></strong> with tools</td></tr>
     </tbody>
   </table>
-  <p class="footnote"><span class="tag no">Not in the paper</span> <span class="term" data-term="langgraph">LangGraph</span> approval breakpoints · named RAG / Code-Gen / Sandbox agents · literature RAG</p>
+  <p class="footnote"><span class="tag no">Not in the paper</span> <span class="term" data-term="langgraph">LangGraph</span> <span class="term" data-term="interrupt">approval breakpoints</span> · named RAG / Code-Gen / Sandbox agents · literature RAG</p>
   <aside class="notes">
     Deterministic safeguard: this holds. The AI writes Python, and COBRApy, StrainDesign and Gurobi do the math inside the sandbox. But note who writes the plan: each benchmark prompt is a human-written lettered protocol (steps A to K) with reaction IDs, bounds and the algorithm already chosen. The AI translates the plan into code; it does not design the analysis.
     Grounding is the real lever. Without retrieval, models invented software commands (GPT-4.1 made up a "strain_design" package), used the wrong library (Cameo instead of StrainDesign), or wrote broken math constraints. With retrieval they adapted working scripts. Deep dive 3 has the numbers.
-    Human in the loop: the only human step in the paper is a timing condition, "ChatGEM coding with manual inspection" (Fig. 2D–F). There are no approval breakpoints, and no approval code in ADEPT's source. The paper mentions no 4-hour simulations; the longest reported run is 954 s.
+    Human in the loop: the only human step in the paper is a timing condition, "ChatGEM coding with manual inspection" (Fig. 2D–F). There are no approval breakpoints, and no approval code in ADEPT's source. The paper mentions no 4-hour simulations; the longest reported run is 954&nbsp;s.
     Agents: the abstract says "specialized agents", but Methods name only ADEPT's Scientific Workflow Agent. The retrieval library is Python scripts, not scientific literature.
   </aside>
 </section>
@@ -101,13 +101,13 @@
     <div>
       <div class="kpis">
         <div class="kpi"><b>2.63 → 4.20</b><span>Mean <span class="term" data-term="ops">code score</span> /5, <span class="term" data-term="o4mini">o4-mini</span>, no <span class="term" data-term="rag">RAG</span> → RAG</span></div>
-        <div class="kpi"><b>~1 day → 13 min</b><span><span class="term" data-term="optknock">OptKnock</span> coding, manual (est.) → agent</span></div>
+        <div class="kpi"><b>~1 day → 13&nbsp;min</b><span><span class="term" data-term="optknock">OptKnock</span> coding, manual (est.) → <span class="term" data-term="agent">agent</span></span></div>
       </div>
       <ul class="small">
-        <li><strong>Rapid iteration:</strong> OptKnock strain design coded in <strong>774 s</strong></li>
+        <li><strong>Rapid iteration:</strong> OptKnock <span class="term" data-term="strain">strain</span> design coded in <strong>774&nbsp;s</strong></li>
         <li><strong>Reproducible:</strong> <strong><span class="term" data-term="langfuse">Langfuse / LangSmith</span></strong> can trace every AI and tool call</li>
-        <li><strong>Cross-domain:</strong> biologists without Python are the goal; <strong>not yet user-tested</strong></li>
-        <li><strong>Caveat:</strong> 1 run per task; with-RAG code ≈ copies of library scripts</li>
+        <li><strong>Cross-domain:</strong> biologists without <span class="term" data-term="python">Python</span> are the goal; <strong>not yet user-tested</strong></li>
+        <li><strong>Caveat:</strong> 1 run per task; with-RAG code ≈ copies of <span class="term" data-term="corpus">library scripts</span></li>
       </ul>
     </div>
     <figure>
@@ -118,7 +118,7 @@
   <aside class="notes">
     Benchmark: three tasks on the P. putida KT2440 model iJN1463. Task 1 is FBA plus four reaction knockouts; Task 2 is OptKnock strain design for succinate; Task 3 is ecOptMDFPathway, a custom Gurobi optimization. Each ran once with and once without retrieval. One AI judge (Claude Sonnet 4.6) scored accuracy and completeness from 1 to 5, combined as 0.7 × accuracy + 0.3 × completeness.
     o4-mini went from 2.63 to 4.20 on average; GPT-4.1 from 2.18 to 4.20. The authors say retrieval "equalizes" models, so the cheaper o4-mini is enough. Cost was not reported.
-    Time: FBA was 254 s manual vs 184 s with inspection vs 3.9 s agent-only; the paper's "65×" headline is that last pair. With inspection it's about 1.4×. OptKnock was 774 s (954 s with inspection) vs "~order of a day" manually, an estimate rather than a measurement. ecOptMDF was 41.8 s (221.8 s with inspection).
+    Time: FBA was 254&nbsp;s manual vs 184&nbsp;s with inspection vs 3.9&nbsp;s agent-only; the paper's "65×" headline is that last pair. With inspection it's about 1.4×. OptKnock was 774&nbsp;s (954&nbsp;s with inspection) vs "~order of a day" manually, an estimate rather than a measurement. ecOptMDF was 41.8&nbsp;s (221.8&nbsp;s with inspection).
     Main caveat: the retrieval library already contains near-exact solutions. With-RAG Task 3 code matches the library script on 183 of 184 lines. The gain mostly measures retrieving the answer key, not generalizing. See deep dive 3 and the backup.
   </aside>
 </section>
@@ -131,7 +131,7 @@
       <h3>Tool abstraction</h3>
       <ul>
         <li><strong><span class="term" data-term="blast">BLAST</span></strong>, <strong><span class="term" data-term="uniprot">UniProt</span></strong>, <strong><span class="term" data-term="pubchem">PubChem</span></strong>, <strong><span class="term" data-term="nextflow">Nextflow</span></strong> as MCP tool servers</li>
-        <li>Schemas over <strong><span class="term" data-term="jsonrpc">JSON-RPC</span></strong> (ADEPT repo)</li>
+        <li><span class="term" data-term="schema">Schemas</span> over <strong><span class="term" data-term="jsonrpc">JSON-RPC</span></strong> (<span class="term" data-term="adept">ADEPT</span> repo)</li>
         <li>The AI sees typed tools, not raw <span class="term" data-term="api">APIs</span></li>
       </ul>
     </div>
@@ -139,8 +139,8 @@
       <h3>Decoupled scaling</h3>
       <ul>
         <li>Servers are <strong><span class="term" data-term="stateless">stateless</span></strong>; state lives in the <span class="term" data-term="orchestration">orchestrator</span></li>
-        <li>Swap or scale a server without touching agent logic</li>
-        <li><strong>COBRApy / StrainDesign are not separate servers</strong>: they’re installed in the sandbox</li>
+        <li>Swap or scale a server without touching <span class="term" data-term="agent">agent</span> logic</li>
+        <li><strong><span class="term" data-term="cobrapy">COBRApy</span> / <span class="term" data-term="straindesign">StrainDesign</span> are not separate servers</strong>: they’re installed in the sandbox</li>
       </ul>
     </div>
     <div class="panel">
@@ -148,7 +148,7 @@
       <ul>
         <li>Generated code goes to the <strong><span class="term" data-term="sandbox">sandbox</span> MCP server</strong></li>
         <li>Isolated network, <span class="term" data-term="nonroot">non-root</span>, <span class="term" data-term="capabilities">dropped capabilities</span>, CPU/memory caps, <span class="term" data-term="egress">egress allowlist</span>, <span class="term" data-term="importcheck">import check</span></li>
-        <li><strong><span class="term" data-term="nsjail">nsjail</span></strong> opt-in, off by default; time limit 30 s default, 300 s max</li>
+        <li><strong><span class="term" data-term="nsjail">nsjail</span></strong> opt-in, off by default; time limit 30&nbsp;s default, 300&nbsp;s max</li>
       </ul>
     </div>
   </div>
@@ -156,22 +156,22 @@
   <aside class="notes">
     The paper describes ADEPT's third tier as "stateless MCP tool servers" that run scientific tools (BLAST, UniProt, PubChem), computing-cluster pipelines (Nextflow), and "sandboxed code on demand". JSON-RPC isn't in the paper, but ADEPT's README says its servers speak the MCP JSON-RPC protocol.
     One correction to a common description: COBRApy and StrainDesign are not their own MCP servers. They are Python libraries installed in ChatGEM's code environment inside the sandbox. The agent reaches them by writing code, not by calling ready-made tools. That's flexible but less constrained; the takeaways slide returns to this trade-off.
-    Sandbox details come from the ADEPT code: execution in a dedicated container on an isolated network that can reach only the orchestration service, a non-administrator user, removed system permissions, CPU and memory limits, an approved list of network destinations, and a pre-run check that blocks disallowed libraries. nsjail is supported but disabled by default. The default time limit is 30 s with a 300 s maximum, below the 774 s OptKnock run, which is why the authors raised run-time limits.
+    Sandbox details come from the ADEPT code: execution in a dedicated container on an isolated network that can reach only the orchestration service, a non-administrator user, removed system permissions, CPU and memory limits, an approved list of network destinations, and a pre-run check that blocks disallowed libraries. nsjail is supported but disabled by default. The default time limit is 30&nbsp;s with a 300&nbsp;s maximum, below the 774&nbsp;s OptKnock run, which is why the authors raised run-time limits.
   </aside>
 </section>
 
 <section class="slide" data-audience="mixed">
   <p class="eyebrow">How the system works · The technical lifecycle</p>
-  <h2>One strain-design request, end to end: the paper’s <span class="term" data-term="optknock">OptKnock</span> task</h2>
+  <h2>One request to design a <span class="term" data-term="strain">strain</span>, end to end: the paper’s <span class="term" data-term="optknock">OptKnock</span> task</h2>
   <ol class="flow">
     <li><strong>Input</strong>User uploads <strong><em><span class="term" data-term="pputida">P. putida</span></em> <span class="term" data-term="ijn1463">iJN1463</span></strong> and a lettered protocol: OptKnock for <span class="term" data-term="succinate">succinate</span>, ≤2 <span class="term" data-term="knockout">knockouts</span>, ≥10% normal growth</li>
-    <li><strong>Retrieve</strong>Agent searches <strong><span class="term" data-term="chromadb">ChromaDB</span></strong> over the 52 curated scripts; finds <code>44._optknock.py</code></li>
+    <li><strong>Retrieve</strong><span class="term" data-term="agent">Agent</span> searches <strong><span class="term" data-term="chromadb">ChromaDB</span></strong> over the 52 curated scripts; finds <code>44._optknock.py</code></li>
     <li><strong>Generate</strong><strong><span class="term" data-term="swa">Scientific Workflow Agent</span></strong> (<span class="term" data-term="react">LangGraph ReAct loop</span>) adapts it into <strong><span class="term" data-term="straindesign">StrainDesign</span> OptKnock</strong> code</li>
-    <li><strong>Execute</strong><strong><span class="term" data-term="sandbox">Sandbox</span> MCP server</strong> runs it with <strong><span class="term" data-term="gurobi">Gurobi</span></strong>; run-time limits raised for long jobs</li>
+    <li><strong>Execute</strong><strong><span class="term" data-term="sandbox">Sandbox</span> <span class="term" data-term="mcp">MCP</span> server</strong> runs it with <strong><span class="term" data-term="gurobi">Gurobi</span></strong>; run-time limits raised for long jobs</li>
     <li><strong>Return</strong>Printed values + <strong>Excel</strong> export; large outputs go to files, summaries go back to the AI</li>
-    <li><strong>Report</strong>Agent answers in chat. Separately, an <strong><span class="term" data-term="llmjudge">AI judge</span></strong> (Claude Sonnet 4.6) graded the code</li>
+    <li><strong>Report</strong>Agent answers in chat. Separately, an <strong><span class="term" data-term="llmjudge">AI judge</span></strong> (<span class="term" data-term="claude">Claude Sonnet 4.6</span>) graded the code</li>
   </ol>
-  <p class="source">Agent-only coding time 774 s; 954 s with manual inspection (Fig. 2E). Step 3 loop and step 5 file handling from the ADEPT repo. The paper has no <em>E. coli</em> / PubChem / JSON-return workflow.</p>
+  <p class="source">Agent-only coding time 774&nbsp;s; 954&nbsp;s with manual inspection (Fig. 2E). Step 3 loop and step 5 file handling from the ADEPT repo. The paper has no <em>E. coli</em> / PubChem / JSON-return workflow.</p>
   <aside class="notes">
     This is Task 2 from the benchmark, the closest real analogue to a "find knockouts for succinate" request. It uses the soil bacterium P. putida KT2440, not E. coli.
     1. The prompt is a detailed human protocol: glucose uptake −6 mmol/gDW/h, eight exchanges set to secretion only, at most two knockouts, at least 10% of wild-type growth, nine excluded reactions, and export to Excel. The user also uploads the model and data files.
@@ -186,18 +186,18 @@
 
 <section class="slide" data-audience="mixed">
   <p class="eyebrow">Engineering takeaways · Build your own ME agent</p>
-  <h2>Keep ChatGEM’s sandbox and curated retrieval; add the guardrails it lacks</h2>
+  <h2>Keep ChatGEM’s <span class="term" data-term="sandbox">sandbox</span> and curated retrieval; add the <span class="term" data-term="guardrails">guardrails</span> it lacks</h2>
   <table>
     <thead>
       <tr><th>Blueprint</th><th>In ChatGEM?</th><th>How to build it</th></tr>
     </thead>
     <tbody>
       <tr><td><strong>The <span class="term" data-term="corpus">script library</span> is the product</strong></td><td><span class="tag ok">Yes: 52 scripts</span></td><td>Cover each analysis you support; version it like code</td></tr>
-      <tr><td><strong>State is king</strong></td><td><span class="tag partial">Chat state only</span></td><td>Typed <strong><span class="term" data-term="langgraph">LangGraph</span></strong> state: model ID, bounds, knockouts, objective; <strong><span class="term" data-term="postgres">Postgres</span></strong> <span class="term" data-term="checkpoint">checkpoints</span></td></tr>
+      <tr><td><strong>State is king</strong></td><td><span class="tag partial">Chat state only</span></td><td>Typed <strong><span class="term" data-term="langgraph">LangGraph</span></strong> state: model ID, <span class="term" data-term="bounds">bounds</span>, <span class="term" data-term="knockout">knockouts</span>, <span class="term" data-term="objective">objective</span>; <strong><span class="term" data-term="postgres">Postgres</span></strong> <span class="term" data-term="checkpoint">checkpoints</span></td></tr>
       <tr><td><strong>Encapsulate compute via <span class="term" data-term="mcp">MCP</span></strong></td><td><span class="tag partial">Sandbox only</span></td><td>Ready-made tools (<code>run_fba</code>, <code>optknock</code>) for common jobs; sandbox for the rest</td></tr>
       <tr><td><strong>Guardrails on model edits</strong></td><td><span class="tag no">No</span></td><td><strong><span class="term" data-term="pydantic">Pydantic</span></strong>: reaction IDs exist, bounds valid, before any solve</td></tr>
       <tr><td><strong>Human approval gates</strong></td><td><span class="tag no">No</span></td><td>LangGraph <code><span class="term" data-term="interrupt">interrupt()</span></code> before long or destructive runs</td></tr>
-      <tr><td><strong><span class="term" data-term="execeval">Execution-based evals</span></strong></td><td><span class="tag no">No: 1 AI judge</span></td><td>Compare fluxes and knockout sets to known answers; held-out tasks; repeats</td></tr>
+      <tr><td><strong><span class="term" data-term="execeval">Execution-based evals</span></strong></td><td><span class="tag no">No: 1 AI judge</span></td><td>Compare <span class="term" data-term="flux">fluxes</span> and knockout sets to known answers; <span class="term" data-term="heldout">held-out</span> tasks; repeats</td></tr>
     </tbody>
   </table>
   <aside class="notes">
@@ -207,7 +207,7 @@
     MCP: ChatGEM reaches COBRApy only through free-form code. For frequent jobs, ready-made tools give validated inputs, structured outputs and easy testing. Keep the sandbox for new analyses.
     Guardrails and approvals: neither exists in ChatGEM. Pydantic appears in ADEPT only for configuration. Check model edits before solving, and pause for human approval before long or destructive jobs.
     Evaluation: score by running the code and comparing its numbers to known answers, and repeat runs. A single AI judge was inconsistent here.
-    Operations: plan for solver licensing, time limits beyond 300 s, and model and spreadsheet file handling.
+    Operations: plan for solver licensing, time limits beyond 300&nbsp;s, and model and spreadsheet file handling.
   </aside>
 </section>
 
@@ -221,7 +221,7 @@
     <li><a href="#/dd-solvers">Solvers</a><span>Math engines that compute every number</span></li>
     <li><a href="#/dd-sandbox">The sandbox</a><span>A safe room for AI-written code</span></li>
     <li><a href="#/dd-mcp">MCP</a><span>A universal plug between AI and tools</span></li>
-    <li><a href="#/dd-adept">The ADEPT platform</a><span>Everything around the agent, ready-made</span></li>
+    <li><a href="#/dd-adept">The ADEPT platform</a><span>Everything around the <span class="term" data-term="agent">agent</span>, ready-made</span></li>
     <li><a href="#/dd-hitl">Human in the loop</a><span>People plan the analysis and check the code</span></li>
     <li><a href="#/dd-tracing">Tracing</a><span>A flight recorder for the agent</span></li>
     <li><a href="#/dd-judge">The AI judge</a><span>How the paper graded the code</span></li>
@@ -259,7 +259,7 @@
       <span class="tag general">General principle</span>
       <ul>
         <li>Candidate designs are tested one by one in the lab</li>
-        <li>Each engineered strain costs time and money to build and test</li>
+        <li>Each engineered <span class="term" data-term="strain">strain</span> costs time and money to build and test</li>
         <li>Models narrow many options to a few worth testing</li>
       </ul>
     </div>
@@ -287,8 +287,8 @@
     <div class="panel in">
       <h3>In ChatGEM</h3>
       <ul>
-        <li>One <strong><span class="term" data-term="swa">Scientific Workflow Agent</span></strong> writes Python and runs it in the sandbox</li>
-        <li>Built as a <strong><span class="term" data-term="langgraph">LangGraph</span></strong> loop (ADEPT code)</li>
+        <li>One <strong><span class="term" data-term="swa">Scientific Workflow Agent</span></strong> writes <span class="term" data-term="python">Python</span> and runs it in the <span class="term" data-term="sandbox">sandbox</span></li>
+        <li>Built as a <strong><span class="term" data-term="langgraph">LangGraph</span></strong> loop (<span class="term" data-term="adept">ADEPT</span> code)</li>
         <li>A guard stops it after 3 repeated or 3 failed tool calls</li>
       </ul>
     </div>
@@ -327,14 +327,14 @@
       <ul>
         <li>Library: <strong>52 expert-curated</strong> example scripts (the <span class="term" data-term="corpus">corpus</span>)</li>
         <li>Stored and searched in <strong><span class="term" data-term="chromadb">ChromaDB</span></strong></li>
-        <li>The agent adapts the closest script to the request</li>
+        <li>The <span class="term" data-term="agent">agent</span> adapts the closest script to the request</li>
       </ul>
     </div>
     <div class="panel without">
       <h3>Without it</h3>
       <span class="tag paper">From the paper</span>
       <ul>
-        <li>Average score fell from <strong>4.20</strong> to <strong>2.63</strong> (o4-mini) and <strong>2.18</strong> (GPT-4.1)</li>
+        <li>Average score fell from <strong>4.20</strong> to <strong>2.63</strong> (<span class="term" data-term="o4mini">o4-mini</span>) and <strong>2.18</strong> (<span class="term" data-term="gpt41">GPT-4.1</span>)</li>
         <li>An AI invented a software package that doesn’t exist</li>
         <li>Another used the wrong library; some code didn’t run</li>
       </ul>
@@ -349,17 +349,17 @@
 
 <section class="slide" id="dd-rag-evidence" data-audience="mixed">
   <p class="eyebrow">Deep dive 3 · RAG: the evidence</p>
-  <h2>With the script library, both AI models averaged 4.20 of 5; without it, 2.18–2.63</h2>
+  <h2>With the <span class="term" data-term="corpus">script library</span>, both AI models averaged 4.20 of 5; without it, 2.18–2.63</h2>
   <table>
     <thead>
-      <tr><th>Task (complexity)</th><th>No RAG</th><th>With RAG</th><th>What went wrong without retrieval</th></tr>
+      <tr><th>Task (complexity)</th><th>No <span class="term" data-term="rag">RAG</span></th><th>With RAG</th><th>What went wrong without retrieval</th></tr>
     </thead>
     <tbody>
       <tr><td><strong><span class="term" data-term="fba">FBA</span> + <span class="term" data-term="knockout">knockouts</span></strong> (low)</td><td>3.60</td><td>4.30</td><td>Blocked reactions by hand instead of using the knockout function</td></tr>
-      <tr><td><strong><span class="term" data-term="optknock">OptKnock</span></strong> (high)</td><td>2.30</td><td>4.00</td><td>Used <span class="term" data-term="cameo">Cameo</span> instead of the requested StrainDesign; syntax errors</td></tr>
+      <tr><td><strong><span class="term" data-term="optknock">OptKnock</span></strong> (high)</td><td>2.30</td><td>4.00</td><td>Used <span class="term" data-term="cameo">Cameo</span> instead of the requested <span class="term" data-term="straindesign">StrainDesign</span>; <span class="term" data-term="syntax">syntax errors</span></td></tr>
       <tr><td><strong><span class="term" data-term="ecoptmdf">ecOptMDFPathway</span></strong> (very high)</td><td>2.00</td><td>4.30</td><td>Broken math constraints; code doesn’t run</td></tr>
       <tr><td><strong>Mean, <span class="term" data-term="o4mini">o4-mini</span></strong></td><td><strong>2.63</strong></td><td><strong>4.20</strong></td><td>Worst on the hardest task</td></tr>
-      <tr><td><strong>Mean, <span class="term" data-term="gpt41">GPT-4.1</span></strong></td><td><strong>2.18</strong></td><td><strong>4.20</strong></td><td>Invented a “strain_design” package; set glucose uptake to 0</td></tr>
+      <tr><td><strong>Mean, <span class="term" data-term="gpt41">GPT-4.1</span></strong></td><td><strong>2.18</strong></td><td><strong>4.20</strong></td><td>Invented a “strain_design” package; set <span class="term" data-term="glucose">glucose uptake</span> to 0</td></tr>
     </tbody>
   </table>
   <p class="footnote"><span class="tag partial">Caveat</span> The library already held near-exact solutions: with-RAG code matched them almost line for line, and both models produced identical code. The test shows retrieval works when the answer is in the library, not how well it generalizes.</p>
@@ -378,7 +378,7 @@
     <div class="panel what">
       <h3>What it is</h3>
       <ul>
-        <li>A <strong><span class="term" data-term="solver">solver</span></strong> finds the provably best answer to an optimization problem</li>
+        <li>A <strong><span class="term" data-term="solver">solver</span></strong> finds the provably best answer to an <span class="term" data-term="optimization">optimization</span> problem</li>
         <li><strong><span class="term" data-term="deterministic">Deterministic</span></strong>: same input and settings, same answer</li>
       </ul>
       <p class="analogy">The AI writes down the recipe; a calibrated oven, not the AI’s guess, does the baking.</p>
@@ -441,7 +441,7 @@
   </div>
   <aside class="notes">
     AI-written code is untrusted by default: the AI can make mistakes, and a cleverly worded input could trick it into writing something harmful. A sandbox runs that code somewhere it can't do damage.
-    ChatGEM's sandbox is a separate container, a self-contained software package isolated from the rest of the system. In the ADEPT code, it runs without administrator rights, with CPU and memory caps, on a network that can reach only the orchestration service and an approved list of addresses. Before running, it reads the code and blocks libraries that aren't allowed. Time limits default to 30 s (300 s max); ChatGEM raised them for long strain-design jobs. An extra isolation layer, nsjail, exists but is switched off by default.
+    ChatGEM's sandbox is a separate container, a self-contained software package isolated from the rest of the system. In the ADEPT code, it runs without administrator rights, with CPU and memory caps, on a network that can reach only the orchestration service and an approved list of addresses. Before running, it reads the code and blocks libraries that aren't allowed. Time limits default to 30&nbsp;s (300&nbsp;s max); ChatGEM raised them for long strain-design jobs. An extra isolation layer, nsjail, exists but is switched off by default.
     The paper states that code runs in a sandbox container; the specific protections come from the ADEPT code, and the paper doesn't say exactly how ChatGEM configured them. The "without" points are standard security reasoning, not something the paper tested.
   </aside>
 </section>
@@ -461,9 +461,9 @@
     <div class="panel in">
       <h3>In ChatGEM</h3>
       <ul>
-        <li>Tool servers for <span class="term" data-term="blast">BLAST</span>, <span class="term" data-term="uniprot">UniProt</span>, <span class="term" data-term="pubchem">PubChem</span>, <span class="term" data-term="nextflow">Nextflow</span>, and the sandbox</li>
+        <li>Tool servers for <span class="term" data-term="blast">BLAST</span>, <span class="term" data-term="uniprot">UniProt</span>, <span class="term" data-term="pubchem">PubChem</span>, <span class="term" data-term="nextflow">Nextflow</span>, and the <span class="term" data-term="sandbox">sandbox</span></li>
         <li>Servers are <span class="term" data-term="stateless">stateless</span>: restart, copy, or swap them freely</li>
-        <li>COBRApy is not a server; the agent reaches it by writing code</li>
+        <li><span class="term" data-term="cobrapy">COBRApy</span> is not a server; the <span class="term" data-term="agent">agent</span> reaches it by writing code</li>
       </ul>
     </div>
     <div class="panel without">
@@ -486,13 +486,13 @@
 
 <section class="slide" id="dd-adept" data-audience="mixed">
   <p class="eyebrow">Deep dive 7 · The ADEPT platform</p>
-  <h2><span class="term" data-term="adept">ADEPT</span> supplies everything around the agent, so ChatGEM only adds the biology</h2>
+  <h2><span class="term" data-term="adept">ADEPT</span> supplies everything around the <span class="term" data-term="agent">agent</span>, so ChatGEM only adds the biology</h2>
   <div class="cols three">
     <div class="panel what">
       <h3>What it is</h3>
       <ul>
-        <li>PNNL’s general platform for building science AI agents</li>
-        <li>Provides login, memory, tools, sandbox, and monitoring</li>
+        <li><span class="term" data-term="pnnl">PNNL</span>’s general platform for building science AI agents</li>
+        <li>Provides login, memory, tools, <span class="term" data-term="sandbox">sandbox</span>, and monitoring</li>
       </ul>
       <p class="analogy">A fully equipped shared lab: ChatGEM brings the experiment, not the building.</p>
     </div>
@@ -501,7 +501,7 @@
       <ul>
         <li>Logins via <span class="term" data-term="keycloak">Keycloak</span>; conversations saved in <span class="term" data-term="postgres">PostgreSQL</span></li>
         <li>AI model picked in a settings file (default <span class="term" data-term="o4mini">o4-mini</span>)</li>
-        <li>ChatGEM adds the modeling sandbox, longer run limits, and the script library</li>
+        <li>ChatGEM adds the modeling sandbox, longer run limits, and the <span class="term" data-term="corpus">script library</span></li>
       </ul>
     </div>
     <div class="panel without">
@@ -538,8 +538,8 @@
       <h3>In ChatGEM</h3>
       <ul>
         <li>The user writes a step-by-step protocol with exact reaction names</li>
-        <li>A scientist inspects the code: FBA took 3.9 s alone, 184 s with inspection</li>
-        <li>No approval step before runs (none in paper or ADEPT code)</li>
+        <li>A scientist inspects the code: <span class="term" data-term="fba">FBA</span> took 3.9&nbsp;s alone, 184&nbsp;s with inspection</li>
+        <li>No approval step before runs (none in paper or <span class="term" data-term="adept">ADEPT</span> code)</li>
       </ul>
     </div>
     <div class="panel without">
@@ -553,7 +553,7 @@
   </div>
   <aside class="notes">
     Human in the loop means a person stays involved at key points instead of letting the AI run on its own.
-    In ChatGEM, people do two things. First, they write the plan: every benchmark prompt is a detailed, lettered protocol with exact reaction IDs, limits and the algorithm to use. The AI translates it into code; it doesn't design the analysis. Second, they inspect: the paper times "ChatGEM coding with manual inspection" separately. For the simple FBA task that's 3.9 s for the agent alone versus 184 s with a person checking.
+    In ChatGEM, people do two things. First, they write the plan: every benchmark prompt is a detailed, lettered protocol with exact reaction IDs, limits and the algorithm to use. The AI translates it into code; it doesn't design the analysis. Second, they inspect: the paper times "ChatGEM coding with manual inspection" separately. For the simple FBA task that's 3.9&nbsp;s for the agent alone versus 184&nbsp;s with a person checking.
     There's no built-in approval step, where the agent pauses and waits for a yes before running something. Neither the paper nor the ADEPT code has one.
     Why checking matters, from the paper's own grades: on the accuracy scale, 5 means "runs correctly and follows best practices". Every script scored 4 or lower, even with retrieval. The judge flagged issues in all of them.
   </aside>
@@ -561,7 +561,7 @@
 
 <section class="slide" id="dd-tracing" data-audience="mixed">
   <p class="eyebrow">Deep dive 9 · Tracing</p>
-  <h2>Tracing records every step the agent takes, so its work can be audited</h2>
+  <h2>Tracing records every step the <span class="term" data-term="agent">agent</span> takes, so its work can be audited</h2>
   <div class="cols three">
     <div class="panel what">
       <h3>What it is</h3>
@@ -574,7 +574,7 @@
     <div class="panel in">
       <h3>In ChatGEM</h3>
       <ul>
-        <li>ADEPT can trace with Langfuse or LangSmith, plus basic logs</li>
+        <li><span class="term" data-term="adept">ADEPT</span> can trace with Langfuse or LangSmith, plus basic logs</li>
         <li>The paper reports no traces or chat transcripts</li>
         <li>So we can’t see how many attempts each task took</li>
       </ul>
@@ -602,7 +602,7 @@
     <div class="panel what">
       <h3>What it is</h3>
       <ul>
-        <li><strong><span class="term" data-term="llmjudge">LLM-as-judge</span></strong>: one AI grades another’s work against a rubric</li>
+        <li><strong><span class="term" data-term="llmjudge">LLM-as-judge</span></strong>: one AI grades another’s work against a <span class="term" data-term="rubric">rubric</span></li>
         <li>Here: 5 = runs correctly; 3 = runs, wrong output; 1 = doesn’t run</li>
       </ul>
       <p class="analogy">Like a teaching assistant with an answer rubric: quick, but can mark the same answer differently twice.</p>
@@ -610,8 +610,8 @@
     <div class="panel in">
       <h3>In ChatGEM</h3>
       <ul>
-        <li>Judge: <strong>Claude Sonnet 4.6</strong>, one pass per script</li>
-        <li>Graded 12 scripts: 3 tasks × with/without RAG × 2 models</li>
+        <li>Judge: <strong><span class="term" data-term="claude">Claude Sonnet 4.6</span></strong>, one pass per script</li>
+        <li>Graded 12 scripts: 3 tasks × with/without <span class="term" data-term="rag">RAG</span> × 2 models</li>
         <li>On identical code, two reports disagreed about a missing column</li>
       </ul>
     </div>
@@ -640,18 +640,18 @@
       <tr><th>Claim</th><th>Verdict</th><th>What the paper shows</th></tr>
     </thead>
     <tbody>
-      <tr><td>Built on PNNL’s <span class="term" data-term="adept">ADEPT</span></td><td><span class="tag ok">Supported</span></td><td>“Built from the ADEPT framework”</td></tr>
-      <tr><td><span class="term" data-term="langgraph">LangGraph</span> orchestration</td><td><span class="tag na">Not addressed</span></td><td>Not in the paper; the ADEPT repo uses it</td></tr>
-      <tr><td>COBRApy + StrainDesign</td><td><span class="tag ok">Supported</span></td><td>Plus hand-built Gurobi optimizations</td></tr>
-      <tr><td><span class="term" data-term="nsjail">nsjail</span> sandboxes</td><td><span class="tag partial">Partly</span></td><td>Container yes; nsjail optional, off by default in ADEPT</td></tr>
-      <tr><td>LLM plans, software computes</td><td><span class="tag partial">Partly</span></td><td>Software computes; the human writes the plan</td></tr>
-      <tr><td>Human approval breakpoints before 4-h runs</td><td><span class="tag no">Not supported</span></td><td>No approval step; longest run 954 s</td></tr>
-      <tr><td>RAG / Code-Gen / Sandbox agents</td><td><span class="tag partial">Partly</span></td><td>One agent; RAG over scripts, not literature</td></tr>
-      <tr><td>Days → minutes</td><td><span class="tag partial">Partly</span></td><td>“~a day” (estimated) → 13 min, coding only</td></tr>
-      <tr><td>Langfuse / LangSmith audit</td><td><span class="tag ok">Supported</span></td><td>Available; not used in results</td></tr>
-      <tr><td>Biologists run FBA without Python</td><td><span class="tag partial">Partly</span></td><td>The stated aim; no user study</td></tr>
-      <tr><td>COBRApy / StrainDesign as MCP servers</td><td><span class="tag partial">Partly</span></td><td>Tools use MCP; COBRApy lives inside the sandbox</td></tr>
-      <tr><td><em>E. coli</em> succinate workflow</td><td><span class="tag no">Contradicted</span></td><td>Real task: <em>P. putida</em> OptKnock, Excel output</td></tr>
+      <tr><td>Built on <span class="term" data-term="pnnl">PNNL</span>’s <span class="term" data-term="adept">ADEPT</span></td><td><span class="tag ok">Supported</span></td><td>“Built from the ADEPT framework”</td></tr>
+      <tr><td><span class="term" data-term="langgraph">LangGraph</span> <span class="term" data-term="orchestration">orchestration</span></td><td><span class="tag na">Not addressed</span></td><td>Not in the paper; the ADEPT repo uses it</td></tr>
+      <tr><td><span class="term" data-term="cobrapy">COBRApy</span> + <span class="term" data-term="straindesign">StrainDesign</span></td><td><span class="tag ok">Supported</span></td><td>Plus hand-built <span class="term" data-term="gurobi">Gurobi</span> optimizations</td></tr>
+      <tr><td><span class="term" data-term="nsjail">nsjail</span> <span class="term" data-term="sandbox">sandboxes</span></td><td><span class="tag partial">Partly</span></td><td><span class="term" data-term="container">Container</span> yes; nsjail optional, off by default in ADEPT</td></tr>
+      <tr><td><span class="term" data-term="llm">LLM</span> plans, software computes</td><td><span class="tag partial">Partly</span></td><td>Software computes; the human writes the plan</td></tr>
+      <tr><td>Human <span class="term" data-term="interrupt">approval breakpoints</span> before 4-h runs</td><td><span class="tag no">Not supported</span></td><td>No approval step; longest run 954&nbsp;s</td></tr>
+      <tr><td><span class="term" data-term="rag">RAG</span> / Code-Gen / Sandbox <span class="term" data-term="agent">agents</span></td><td><span class="tag partial">Partly</span></td><td>One agent; RAG over scripts, not literature</td></tr>
+      <tr><td>Days → minutes</td><td><span class="tag partial">Partly</span></td><td>“~a day” (estimated) → 13&nbsp;min, coding only</td></tr>
+      <tr><td><span class="term" data-term="langfuse">Langfuse / LangSmith</span> audit</td><td><span class="tag ok">Supported</span></td><td>Available; not used in results</td></tr>
+      <tr><td>Biologists run <span class="term" data-term="fba">FBA</span> without <span class="term" data-term="python">Python</span></td><td><span class="tag partial">Partly</span></td><td>The stated aim; no user study</td></tr>
+      <tr><td>COBRApy / StrainDesign as <span class="term" data-term="mcp">MCP</span> servers</td><td><span class="tag partial">Partly</span></td><td>Tools use MCP; COBRApy lives inside the sandbox</td></tr>
+      <tr><td><em><span class="term" data-term="ecoli">E. coli</span></em> <span class="term" data-term="succinate">succinate</span> workflow</td><td><span class="tag no">Contradicted</span></td><td>Real task: <em><span class="term" data-term="pputida">P. putida</span></em> <span class="term" data-term="optknock">OptKnock</span>, Excel output</td></tr>
       <tr><td><span class="term" data-term="pydantic">Pydantic</span> validators on model edits</td><td><span class="tag na">Not addressed</span></td><td>Pydantic only for configuration</td></tr>
     </tbody>
   </table>
@@ -668,19 +668,19 @@
     <div>
       <h3>Benchmark</h3>
       <ul class="small">
-        <li><strong>Answer key in the library:</strong> with-RAG Task 3 code matches <code>51._ecOptMDFPathway.py</code> on 183 of 184 lines</li>
+        <li><strong>Answer key in the library:</strong> with-<span class="term" data-term="rag">RAG</span> Task 3 code matches <code>51._ecOptMDFPathway.py</code> on 183 of 184 lines</li>
         <li><strong>Tiny sample:</strong> 3 tasks × 1 run; no variation measured, no unseen tasks</li>
         <li><strong>One <span class="term" data-term="llmjudge">AI judge</span></strong>, inconsistent on identical code</li>
-        <li><strong>“65×”</strong> = 254 s vs 3.9 s without inspection; <strong>1.4×</strong> with it</li>
+        <li><strong>“65×”</strong> = 254&nbsp;s vs 3.9&nbsp;s without inspection; <strong>1.4×</strong> with it</li>
       </ul>
     </div>
     <div>
       <h3>Case study</h3>
       <ul class="small">
-        <li><strong>n = 4 strains</strong>; predicted rates compared with measured <span class="term" data-term="titer">titers</span></li>
-        <li>Enzyme demand vs <span class="term" data-term="proteomics">proteomics</span>: <strong><span class="term" data-term="correlation">r = 0.50</span></strong>, called “strong agreement”</li>
-        <li>Paper’s own <span class="term" data-term="sli">leakage index</span>: <span class="term" data-term="wildtype">WT</span> (0.12) ≤ Constitutive (0.13) at 24&nbsp;h</li>
-        <li>No transcripts: the agent’s share of the analysis is unknown</li>
+        <li><strong>n = 4 <span class="term" data-term="strain">strains</span></strong>; predicted rates compared with measured <span class="term" data-term="titer">titers</span></li>
+        <li><span class="term" data-term="enzyme">Enzyme</span> demand vs <span class="term" data-term="proteomics">proteomics</span>: <strong><span class="term" data-term="correlation">r = 0.50</span></strong>, called “strong agreement”</li>
+        <li>Paper’s own <span class="term" data-term="sli">leakage index</span>: <span class="term" data-term="wildtype">WT</span> (0.12) ≤ <span class="term" data-term="constitutive">Constitutive</span> (0.13) at 24&nbsp;h</li>
+        <li>No transcripts: the <span class="term" data-term="agent">agent</span>’s share of the analysis is unknown</li>
       </ul>
     </div>
   </div>
@@ -688,7 +688,7 @@
   <aside class="notes">
     Benchmark: the retrieval library contains 44._optknock.py and 51._ecOptMDFPathway.py, which solve Tasks 2 and 3 on the same model with the same data. With-RAG outputs are near-verbatim copies (Task 2: 175 of 182 lines; Task 3: 183 of 184), and both models produced identical with-RAG code on all three tasks.
     Judge: on byte-identical OptKnock code, one judge report says a column is missing and the other says it's present. The code does contain it.
-    Case study: eight enzyme-constrained models (4 strains × 12 h and 24 h) ranked the Constitutive dCas12a strain best, and it did have the highest measured titer at 24 h (≈0.43 g/L). But at 24 h the model predicts wild type and Landing Pad equal, while Landing Pad measured about 35% lower. It predicts the Induced strain declines while it measured rising. And the paper's own leakage-index numbers contradict its "lowest at both time points" claim for Constitutive.
+    Case study: eight enzyme-constrained models (4 strains × 12&nbsp;h and 24&nbsp;h) ranked the Constitutive dCas12a strain best, and it did have the highest measured titer at 24&nbsp;h (≈0.43 g/L). But at 24&nbsp;h the model predicts wild type and Landing Pad equal, while Landing Pad measured about 35% lower. It predicts the Induced strain declines while it measured rising. And the paper's own leakage-index numbers contradict its "lowest at both time points" claim for Constitutive.
     None of this makes ChatGEM uninteresting. The architecture is a sound pattern. But the evaluation is an early proof of concept, not evidence of general capability.
   </aside>
 </section>
@@ -703,42 +703,62 @@
   <dd>An AI that doesn’t just chat: it decides on a step, uses a tool (such as running code), looks at the result, and repeats until the task is done.</dd>
   <dt data-term="api">API</dt>
   <dd>The set of commands a piece of software offers to programmers. “Inventing an API” means writing code that calls commands that don’t exist.</dd>
+  <dt data-term="benchmark">Benchmark</dt>
+  <dd>A fixed set of test tasks used to measure and compare performance. ChatGEM’s benchmark had three metabolic-modeling tasks.</dd>
   <dt data-term="blast">BLAST</dt>
   <dd>A widely used tool that finds DNA or protein sequences similar to a query sequence.</dd>
+  <dt data-term="bounds">Bounds</dt>
+  <dd>The lowest and highest flow each reaction is allowed in a model. Setting both to zero switches a reaction off.</dd>
   <dt data-term="cameo">Cameo</dt>
   <dd>Another Python package for strain design. The benchmark task asked for StrainDesign, so using Cameo counted as an error.</dd>
-  <dt data-term="capabilities">Dropped capabilities</dt>
-  <dd>System permissions removed from the code’s process, so it can’t change network settings, system files, or other programs.</dd>
   <dt data-term="checkpoint">Checkpoint</dt>
   <dd>A saved snapshot of the agent’s progress, so a conversation can resume after a pause or crash.</dd>
   <dt data-term="chromadb">ChromaDB</dt>
   <dd>A database that finds documents by meaning rather than exact words. ChatGEM uses it to find the stored example script closest to the user’s request.</dd>
+  <dt data-term="claude">Claude Sonnet 4.6</dt>
+  <dd>An AI model made by Anthropic. The paper used it only to grade the code ChatGEM wrote, not to write it.</dd>
   <dt data-term="cobrapy">COBRApy</dt>
   <dd>Free Python software, widely used to build and simulate metabolic models. It runs FBA and related analyses.</dd>
+  <dt data-term="ops">Code score (OPS)</dt>
+  <dd>The paper’s 1–5 grade for each script: 0.7 × accuracy + 0.3 × completeness, both scored by an AI judge.</dd>
+  <dt data-term="constitutive">Constitutive strain</dt>
+  <dd>One of the four engineered <em>P. putida</em> strains in the case study. It always produces dCas12a, a CRISPR protein that can switch genes down without cutting DNA.</dd>
   <dt data-term="container">Container</dt>
   <dd>A self-contained package of software and its settings that runs isolated from the rest of the computer, like a shipping container for programs.</dd>
-  <dt data-term="corpus">Script library (corpus)</dt>
-  <dd>The 52 example scripts, curated by the authors, that ChatGEM searches before writing code. Its coverage decides what the agent can do reliably.</dd>
   <dt data-term="correlation">Correlation (r)</dt>
   <dd>A number from −1 to 1 measuring how closely two measurements rise and fall together. 0 means no relationship, 1 a perfect one; 0.5 is moderate.</dd>
   <dt data-term="deterministic">Deterministic</dt>
   <dd>Gives the same output every time for the same input. Scientific software is deterministic; AI language models are not.</dd>
+  <dt data-term="capabilities">Dropped capabilities</dt>
+  <dd>System permissions removed from the code’s process, so it can’t change network settings, system files, or other programs.</dd>
+  <dt data-term="ecoli"><em>E. coli</em></dt>
+  <dd><em>Escherichia coli</em>: the most studied lab bacterium. The original brief said ChatGEM used it; the paper actually used <em>P. putida</em>.</dd>
   <dt data-term="ecgem">ecGEM</dt>
   <dd>Enzyme-constrained GEM: a metabolic model that also accounts for how much enzyme (protein machinery) each reaction needs, since a cell can only make so much protein.</dd>
   <dt data-term="ecoptmdf">ecOptMDFPathway</dt>
   <dd>The paper’s hardest task: a custom optimization combining enzyme limits with thermodynamics (whether reactions are energetically favorable) to find production pathways.</dd>
   <dt data-term="egress">Egress allowlist</dt>
   <dd>The sandbox may only connect to an approved list of network addresses; every other outgoing connection is blocked.</dd>
+  <dt data-term="enzyme">Enzyme</dt>
+  <dd>A protein that speeds up one specific chemical reaction in the cell. Cells can only make so much protein, which limits how fast reactions can run.</dd>
   <dt data-term="execeval">Execution-based evaluation</dt>
   <dd>Grading code by running it and comparing its numbers (fluxes, knockout lists) with a known correct answer, instead of having someone read it.</dd>
   <dt data-term="fba">FBA (flux balance analysis)</dt>
   <dd>A calculation that finds how material should flow through a metabolic model’s reactions to reach a goal, such as maximum growth.</dd>
+  <dt data-term="flux">Flux</dt>
+  <dd>The rate at which material flows through a reaction, for example millimoles per gram of cells per hour.</dd>
   <dt data-term="gem">GEM (genome-scale metabolic model)</dt>
   <dd>A computer map of all the chemical reactions an organism is known to carry out, built from its genome. Used to predict growth and what the cell can produce.</dd>
+  <dt data-term="glucose">Glucose uptake</dt>
+  <dd>How fast the modeled cell takes in glucose, its sugar food source. Setting it to 0 starves the model cell, so it can’t grow.</dd>
   <dt data-term="gpt41">GPT-4.1</dt>
   <dd>An OpenAI language model, compared against o4-mini in the paper.</dd>
+  <dt data-term="guardrails">Guardrails</dt>
+  <dd>Automatic checks that stop an AI from taking invalid or unsafe actions, such as editing a reaction that doesn’t exist.</dd>
   <dt data-term="gurobi">Gurobi</dt>
   <dd>A commercial optimization solver: the engine that actually does the math, finding the best answer to large optimization problems.</dd>
+  <dt data-term="heldout">Held-out tasks</dt>
+  <dd>Test tasks deliberately kept out of the reference library, to check whether the AI can handle something genuinely new.</dd>
   <dt data-term="hitl">Human in the loop</dt>
   <dd>A person reviews or steers the AI at key points instead of letting it run fully on its own.</dd>
   <dt data-term="ijn1463">iJN1463</dt>
@@ -759,6 +779,8 @@
   <dd>Open-source software for building AI agents as a flowchart of steps (think, use a tool, check, repeat), with progress saved between steps.</dd>
   <dt data-term="llm">LLM (large language model)</dt>
   <dd>The kind of AI behind chatbots like ChatGPT. It predicts text, including computer code, from patterns learned in training, and can sound confident while being wrong.</dd>
+  <dt data-term="wrapper">LLM wrapper</dt>
+  <dd>A thin app that passes your question to an AI model and shows its reply, with no tools, checks, or reference material.</dd>
   <dt data-term="llmjudge">LLM-as-judge</dt>
   <dd>Using one AI model to grade another’s output against a rubric. Fast and cheap, but it can be inconsistent.</dd>
   <dt data-term="matlab">MATLAB</dt>
@@ -775,8 +797,10 @@
   <dd>An extra isolation layer (a “jail”) for running untrusted programs on Linux. ADEPT supports it, but it’s switched off by default.</dd>
   <dt data-term="o4mini">o4-mini</dt>
   <dd>A smaller, cheaper OpenAI language model. It’s ChatGEM’s default.</dd>
-  <dt data-term="ops">Code score (OPS)</dt>
-  <dd>The paper’s 1–5 grade for each script: 0.7 × accuracy + 0.3 × completeness, both scored by an AI judge.</dd>
+  <dt data-term="objective">Objective</dt>
+  <dd>The quantity an optimization tries to maximize or minimize, such as growth rate or product output.</dd>
+  <dt data-term="optimization">Optimization</dt>
+  <dd>Finding the best choice among all allowed options, for example the reaction flows that give the fastest growth.</dd>
   <dt data-term="optknock">OptKnock</dt>
   <dd>An algorithm that searches for reactions to switch off so a microbe is forced to make more of a desired product while still growing.</dd>
   <dt data-term="orchestration">Orchestration</dt>
@@ -785,34 +809,46 @@
   <dd>Pacific Northwest National Laboratory, a US Department of Energy research lab, where ChatGEM and ADEPT were built.</dd>
   <dt data-term="postgres">PostgreSQL</dt>
   <dd>A widely used database. ADEPT stores conversations and agent checkpoints in it.</dd>
-  <dt data-term="pputida">Pseudomonas putida</dt>
-  <dd>A hardy soil bacterium popular in industrial biotechnology. The paper uses strain KT2440.</dd>
   <dt data-term="preprint">Preprint</dt>
   <dd>A paper shared publicly before peer review. bioRxiv is the main preprint server for biology.</dd>
   <dt data-term="proteomics">Proteomics</dt>
   <dd>Measuring which proteins are present in cells, and how much of each.</dd>
+  <dt data-term="pputida">Pseudomonas putida</dt>
+  <dd>A hardy soil bacterium popular in industrial biotechnology. The paper uses strain KT2440.</dd>
   <dt data-term="pubchem">PubChem</dt>
   <dd>A large public database of chemical compounds and their properties.</dd>
   <dt data-term="pydantic">Pydantic</dt>
   <dd>A Python tool that checks data against rules (right type, allowed values) and rejects anything that doesn’t fit.</dd>
+  <dt data-term="python">Python</dt>
+  <dd>The programming language most scientific and AI software is written in, including COBRApy and StrainDesign.</dd>
   <dt data-term="rag">RAG (retrieval-augmented generation)</dt>
   <dd>Before answering, the AI looks up relevant reference material and uses it: an open-book exam instead of answering from memory.</dd>
   <dt data-term="react">ReAct loop</dt>
   <dd>A common agent pattern that alternates reasoning (“what next?”) with acting (calling a tool), then reads the result and repeats.</dd>
+  <dt data-term="rubric">Rubric</dt>
+  <dd>A scoring guide that spells out what earns each grade.</dd>
   <dt data-term="sandbox">Sandbox</dt>
   <dd>A sealed-off area where AI-written code runs. If the code is wrong or harmful, the damage stays inside: it can’t touch your files, freely reach the internet, or use unlimited computing power.</dd>
-  <dt data-term="sli">Succinate leakage index</dt>
-  <dd>A ratio the authors defined: enzyme use at the step that consumes succinate, divided by two steps that produce it. In the paper, lower values mark strains expected to excrete more succinate.</dd>
+  <dt data-term="schema">Schema</dt>
+  <dd>A formal description of what inputs a tool accepts and what it returns, so an AI can call it correctly.</dd>
+  <dt data-term="swa">Scientific Workflow Agent</dt>
+  <dd>ADEPT’s general-purpose agent that writes and runs scientific code. It’s the only agent the paper names.</dd>
+  <dt data-term="corpus">Script library (corpus)</dt>
+  <dd>The 52 example scripts, curated by the authors, that ChatGEM searches before writing code. Its coverage decides what the agent can do reliably.</dd>
   <dt data-term="solver">Solver</dt>
   <dd>Math software that finds the best possible answer to a well-defined optimization problem, and can prove it’s the best.</dd>
   <dt data-term="stateless">Stateless</dt>
   <dd>Keeps no memory between requests. Each call is self-contained, so the server can be restarted or copied without losing anything.</dd>
+  <dt data-term="strain">Strain</dt>
+  <dd>A genetically distinct version of an organism, such as a microbe engineered to make more of a chemical.</dd>
   <dt data-term="straindesign">StrainDesign</dt>
   <dd>Python software that finds genetic changes, such as knockouts, to engineer a microbe toward a goal. OptKnock is one of its methods.</dd>
   <dt data-term="succinate">Succinate</dt>
   <dd>Succinic acid: a chemical cells make naturally, used industrially for plastics, solvents, and food additives. A common target for microbial production.</dd>
-  <dt data-term="swa">Scientific Workflow Agent</dt>
-  <dd>ADEPT’s general-purpose agent that writes and runs scientific code. It’s the only agent the paper names.</dd>
+  <dt data-term="sli">Succinate leakage index</dt>
+  <dd>A ratio the authors defined: enzyme use at the step that consumes succinate, divided by two steps that produce it. In the paper, lower values mark strains expected to excrete more succinate.</dd>
+  <dt data-term="syntax">Syntax error</dt>
+  <dd>A grammar mistake in code, like a missing bracket. It stops the program from running at all.</dd>
   <dt data-term="titer">Titer</dt>
   <dd>How much product has accumulated in the culture, for example grams of succinate per liter.</dd>
   <dt data-term="uniprot">UniProt</dt>
