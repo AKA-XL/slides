@@ -2,6 +2,14 @@
 
 Horizontal HTML slide decks for computational biology research talks, together with the technical documentation behind them.
 
+**Live decks:** https://aka-xl.github.io/slides/
+
+## Publishing
+
+GitHub Pages serves this repository as static files from the `main` branch root (Settings → Pages → Deploy from a branch → `main` / `/ (root)`). Every push to `main` updates the site within a minute or two. Each deck is live at `https://aka-xl.github.io/slides/slides/<deck-name>/`.
+
+The published site is public and includes everything in the repository, `docs/` included, even though the repository itself is private.
+
 ## Layout
 
 | Path | Contents |
