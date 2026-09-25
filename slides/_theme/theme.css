@@ -22,7 +22,7 @@
 
 /* Canvas */
 .reveal-viewport { background: var(--paper); }
-.reveal { font-family: var(--font); font-size: 26px; line-height: 1.4; color: var(--ink); }
+.reveal { font-family: var(--font); font-size: 26px; line-height: 1.5; color: var(--ink); }
 .reveal .slides { text-align: left; }
 .reveal .slides > section {
   height: 100%;
@@ -39,7 +39,7 @@
 .reveal .subtitle { font-size: 0.95em; color: var(--muted); margin: 0.5em 0 1.4em; }
 .reveal p { margin: 0 0 0.6em; }
 .reveal ul { margin: 0; padding-left: 1.05em; }
-.reveal li { margin: 0 0 0.5em; }
+.reveal li { margin: 0 0 0.6em; }
 .reveal li::marker { color: var(--bio); }
 .reveal strong { font-weight: 700; }
 .reveal em { font-style: italic; }
@@ -59,8 +59,8 @@
   border: 1px solid var(--line);
   border-top: 4px solid var(--comp);
   border-radius: 10px;
-  padding: 18px 22px;
-  font-size: 0.74em;
+  padding: 20px 24px;
+  font-size: 0.78em;
 }
 .reveal .panel h3 { color: var(--comp); }
 
@@ -123,10 +123,10 @@
 .reveal ol.flow > li strong:first-child { display: block; color: var(--comp); margin-bottom: 0.2em; }
 
 /* Tables */
-.reveal table { width: 100%; border-collapse: collapse; font-size: 0.6em; margin: 0; }
+.reveal table { width: 100%; border-collapse: collapse; font-size: 0.62em; line-height: 1.45; margin: 0; }
 .reveal table.dense { font-size: 0.5em; }
 .reveal th { text-align: left; font-weight: 700; color: var(--muted); border-bottom: 2px solid var(--ink); padding: 0.4em 0.6em; }
-.reveal td { vertical-align: top; border-bottom: 1px solid var(--line); padding: 0.45em 0.6em; }
+.reveal td { vertical-align: top; border-bottom: 1px solid var(--line); padding: 0.55em 0.7em; }
 .reveal table.dense td, .reveal table.dense th { padding: 0.28em 0.6em; }
 
 /* Verdict tags */
@@ -169,7 +169,7 @@
 .reveal ol.chapters a { font-weight: 700; text-decoration: none; }
 .reveal ol.chapters > li > span { display: block; color: var(--muted); }
 
-/* Glossary terms with info tooltips (terms.js) */
+/* Glossary terms (terms.js): hover card and click-to-open modal */
 .reveal .term { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.18em; cursor: help; }
 .reveal .term-tail { white-space: nowrap; }
 .reveal .term-info {
@@ -186,22 +186,58 @@
   background: #eef0fb;
   border: 1px solid #c7ccf1;
   border-radius: 50%;
-  cursor: help;
+  cursor: pointer;
 }
 .reveal .term-info:hover, .reveal .term-info:focus-visible { color: #fff; background: var(--comp); border-color: var(--comp); outline: none; }
-.term-tip {
+
+.term-card {
   position: fixed;
   z-index: 1000;
-  max-width: 340px;
-  padding: 10px 14px;
-  font: 14px/1.45 var(--font);
-  color: #fff;
-  background: var(--ink);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.24);
+  box-sizing: border-box;
+  max-width: 400px;
+  padding: 14px 18px 15px;
+  font: 16px/1.55 var(--font);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--comp);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(16, 24, 40, 0.18);
   pointer-events: none;
 }
-.term-tip strong { display: block; margin-bottom: 3px; }
+.term-card .term-name { display: block; margin-bottom: 4px; font-weight: 700; color: var(--comp); }
+.term-card .term-definition { margin: 0; }
+
+.term-dialog {
+  box-sizing: border-box;
+  width: min(540px, calc(100vw - 32px));
+  padding: 28px 32px 30px;
+  font: 18px/1.6 var(--font);
+  color: var(--ink);
+  background: var(--paper);
+  border: none;
+  border-top: 5px solid var(--comp);
+  border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(16, 24, 40, 0.3);
+}
+.term-dialog::backdrop { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(2px); }
+.term-dialog .term-name { margin: 0 40px 10px 0; font-size: 24px; line-height: 1.25; font-weight: 700; color: var(--ink); }
+.term-dialog .term-definition { margin: 0; }
+.term-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font: 24px/1 var(--font);
+  color: var(--muted);
+  background: var(--panel);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.term-dialog-close:hover, .term-dialog-close:focus-visible { color: var(--ink); background: var(--line); outline: none; }
 
 /* Backup slides */
 .reveal section.backup .eyebrow { color: var(--muted); }
